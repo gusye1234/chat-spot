@@ -14,7 +14,7 @@
 </div>
 
 
-ChatSpot is an AI-powered, S potlight assistant designed to help users complete tasks quickly and efficiently. Anytime or angwhere, press `command/ctrl + alt + k`, ChatSpot is always ready to assist. 
+ChatSpot is an AI-powered, Spotlight assistant designed to help users complete tasks quickly and efficiently. Anytime or anywhere, press `command/ctrl + alt + k` and ChatSpot is always ready to assist. 
 
 By default, anything said by ChatSpot will be automatically copied. So all you need is:
 
@@ -32,11 +32,11 @@ ChatSpot also supports custom prompts. You can use "/" to invoke a window custom
 
 Download the app
 
-| Platform | Tested Supports    | Download |
-| -------- | ------------------ | -------- |
-| MacOS    | Support 13.5.2+    |          |
-| Windows  | Haven't tested yet | /        |
-| Linux    | Haven't tested yet | /        |
+| Platform | Tested Supports    | Download                                                     |
+| -------- | ------------------ | ------------------------------------------------------------ |
+| MacOS    | Support 13.5.2+    | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.1) |
+| Windows  | Haven't tested yet | /                                                            |
+| Linux    | Haven't tested yet | /                                                            |
 
 
 
@@ -59,4 +59,4 @@ pnpm package
 
 ## Credits
 
-* Thanks to [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) , I saved a lot of time for the inital setup.
+* Thanks to [Electron React Boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) , I saved a lot of time for the inital setup.i
