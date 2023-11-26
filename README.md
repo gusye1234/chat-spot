@@ -28,6 +28,8 @@ ChatSpot also supports custom prompts. You can use "/" to invoke a window custom
 
 ## Get Started
 
+> **Using ChatSpot requires your own OpenAI key to connect to ChatGPT.**
+
 Download the app
 
 | Platform | Tested Supports    | Download |
