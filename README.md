@@ -13,8 +13,9 @@
 
 
 <p align="center">
-  <img src="./docs/show.gif" alt="show" style="border-radius:20px;">
+  <img src="https://github.com/gusye1234/chat-spot/releases/download/v0.0.1/show.gif" alt="show" style="border-radius:20px;">
 </p>
+
 
 
 
@@ -29,8 +30,9 @@ By default, anything said by ChatSpot will be automatically copied. So all you n
 ChatSpot also supports custom prompts. You can use "/" to invoke a window customized with your prompt.
 
 <p align="center">
-  <img src="./docs/prompt.gif" alt="prompt" style="border-radius:20px;">
+  <img src="https://github.com/gusye1234/chat-spot/releases/download/v0.0.1/prompt.gif" alt="prompt" style="border-radius:20px;">
 </p>
+
 
 
 
