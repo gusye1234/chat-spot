@@ -12,7 +12,9 @@
 </div>
 
 
-![show](./docs/show.gif)
+<p align="center">
+  <img src="./docs/show.gif" alt="show" style="border-radius:20px;">
+</p>
 
 
 
@@ -26,7 +28,11 @@ By default, anything said by ChatSpot will be automatically copied. So all you n
 
 ChatSpot also supports custom prompts. You can use "/" to invoke a window customized with your prompt.
 
-![prompt](./docs/prompt.gif)
+<p align="center">
+  <img src="./docs/prompt.gif" alt="prompt" style="border-radius:20px;">
+</p>
+
+
 
 ## Get Started
 
