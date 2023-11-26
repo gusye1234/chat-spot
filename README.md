@@ -1,5 +1,3 @@
-![show](./docs/show.png)
-
 <div align="center">
   <h1>ChatSpot🥸</h1>
   <p><strong>Spotlight app for ChatGPT</strong></p>
@@ -14,6 +12,10 @@
 </div>
 
 
+![show](./docs/show.gif)
+
+
+
 ChatSpot is an AI-powered, Spotlight assistant designed to help users complete tasks quickly and efficiently. Anytime or anywhere, press `command/ctrl + alt + k` and ChatSpot is always ready to assist. 
 
 By default, anything said by ChatSpot will be automatically copied. So all you need is:
@@ -24,7 +26,7 @@ By default, anything said by ChatSpot will be automatically copied. So all you n
 
 ChatSpot also supports custom prompts. You can use "/" to invoke a window customized with your prompt.
 
-![prompt](./docs/prompt.png)
+![prompt](./docs/prompt.gif)
 
 ## Get Started
 
