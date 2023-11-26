@@ -180,7 +180,7 @@
   },
   "build": {
     "productName": "ChatSpot",
-    "appId": "org.erb.ElectronReact",
+    "appId": "org.erb.ChatSpot",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -238,8 +238,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "gusye1234",
+      "repo": "chat-spot"
     }
   },
   "devEngines": {
