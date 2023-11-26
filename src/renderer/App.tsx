@@ -12,14 +12,19 @@ import {
   Pause,
   BugPlay,
   Eraser,
+  Plus,
+  X,
 } from 'lucide-react';
-import { validateOpenAIKey } from './lib/utils';
+import { cn, validateOpenAIKey } from './lib/utils';
 import { OpenAI } from 'openai';
 import {
   systemPrompt,
   thinkingPrompt,
   greetingPrompt,
   cantGreetingPrompt,
+  addPromptFailed,
+  addPromptTemplate,
+  addPromptHint,
 } from './lib/constants';
 import { User, Bot, Drag } from './components/icons';
 import {
@@ -29,12 +34,24 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
+let openaiUserKey = window.electron.openai.openaiKey;
+
+window.electron.ipcRenderer.on('reset-openai-key', () => {
+  openaiUserKey = '';
+  window.location.reload();
+  console.log('Calling');
+});
+
 function Spotlight() {
-  const [openAIKey, setOpenAIKey] = useState(window.electron.openai.openaiKey);
-  const [openaiKeyAlready, setOpenaiKeyAlready] = useState(
-    validateOpenAIKey(window.electron.openai.openaiKey),
-  );
+  const [openAIKey, setOpenAIKey] = useState('');
+  const [promptDict, setPromptDict] = useState(window.utils.getPrompts());
+  // const [openaiKeyAlready, setOpenaiKeyAlready] = useState(
+  //   validateOpenAIKey(window.electron.openai.openaiKey),
+  // );
+  const openaiKeyAlready = validateOpenAIKey(openaiUserKey);
   const [userInput, setUserInput] = useState('');
+  const [promptOpen, setPromptOpen] = useState(false);
+  const [promptSelect, setPromptSelect] = useState(0);
   const [waiting, setWaiting] = useState(false);
   const [canvasRect, setCanvasRect] = useState({
     width: 0,
@@ -42,6 +59,7 @@ function Spotlight() {
   });
   const stopGenerating = useRef(false);
   const totalWindow = useRef<HTMLDivElement>(null);
+  const inputBox = useRef<HTMLInputElement>(null);
   const outputPane = useRef<HTMLTextAreaElement>(null);
   const [copied, setCopied] = useState(false);
   const [autoCopy, setAutoCopy] = useState(true);
@@ -50,7 +68,7 @@ function Spotlight() {
   const [aiResponse, setAiResponse] = useState('');
 
   const openai = new OpenAI({
-    apiKey: openAIKey,
+    apiKey: openaiUserKey,
     dangerouslyAllowBrowser: true,
   });
 
@@ -82,11 +100,39 @@ function Spotlight() {
   const handleSetOpenAIKey = async () => {
     if (validateOpenAIKey(openAIKey)) {
       window.electron.openai.saveOpenAIKey(openAIKey);
-      setOpenaiKeyAlready(true);
+      openaiUserKey = openAIKey;
+      setOpenAIKey('');
     }
   };
+  const handleNewPrompt = (name: string, content: string) => {
+    window.utils.addPrompt(name, content);
+    promptDict[name] = content;
+    setPromptDict(promptDict);
+    setAiResponse(`🚀 Your prompt is added:
+
+title: ${name}
+prompt: ${content}`);
+    setUserInput('');
+  };
+
   const handleSend = async () => {
     if (!userInput) {
+      return;
+    }
+    // command mode
+    if (userInput.startsWith('!')) {
+      const command = userInput.trim().split(' ');
+      if (command[0] === '!addPrompt') {
+        if (command.length < 3) {
+          setAiResponse(addPromptFailed);
+        } else {
+          handleNewPrompt(
+            command[1],
+            command.slice(2, command.length).join(' '),
+          );
+        }
+      }
+
       return;
     }
     stopGenerating.current = false;
@@ -135,12 +181,38 @@ function Spotlight() {
     }
     setWaiting(false);
   };
-  const handleCopy = async (content: string) => {
-    console.log('Copied');
+
+  const handlePromptSheetAdd = () => {
+    setPromptOpen(false);
+    setUserInput(addPromptTemplate);
+    setAiResponse(addPromptHint);
+  };
+  const handlePromptClick = (key: string) => {
+    setPromptOpen(false);
+    setUserInput(userInput.slice(0, userInput.length - 1) + promptDict[key]);
+  };
+  const handleCopy = (content: string) => {
     // clipboard.writeText(aiResponse);
     window.utils.clipboardWrite(content);
     setCopied(true);
   };
+
+  useEffect(() => {
+    if (userInput.endsWith('/')) {
+      setPromptOpen(true);
+    }
+  }, [userInput]);
+
+  useEffect(() => {
+    if (!promptOpen) {
+      if (inputBox.current) inputBox.current.focus();
+    }
+  }, [promptOpen]);
+
+  useEffect(() => {
+    if (inputBox.current) inputBox.current.focus();
+  }, [aiResponse]);
+
   useLayoutEffect(() => {
     if (totalWindow && totalWindow.current) {
       window.electron.ipcRenderer.sendMessage('resize-window', {
@@ -152,10 +224,11 @@ function Spotlight() {
         height: totalWindow.current.clientHeight,
       });
     }
+    if (inputBox.current) inputBox.current.focus();
   }, []);
-  useLayoutEffect(() => {
+
+  useEffect(() => {
     if (totalWindow && totalWindow.current) {
-      console.log('Update!');
       const currentRect = {
         width: totalWindow.current.clientWidth,
         height: totalWindow.current.clientHeight,
@@ -168,23 +241,39 @@ function Spotlight() {
         setCanvasRect(currentRect);
       }
     }
-  }, [openaiKeyAlready, userInput, aiResponse, canvasRect, totalWindow]);
+    // if (inputBox.current) inputBox.current.focus();
+  }, [
+    openaiKeyAlready,
+    userInput,
+    promptOpen,
+    aiResponse,
+    canvasRect,
+    totalWindow,
+  ]);
+
   return (
-    <div className="p-0.5 overflow-hidden" ref={totalWindow}>
-      <div className="p-2 flex flex-col justify-center gap-1 items-center rounded-lg bg-background">
+    <div className="p-1" ref={totalWindow}>
+      <div className="p-2 flex flex-col justify-center items-center rounded-2xl bg-background border-2">
         {openaiKeyAlready ? (
           <div className="relative flex flex-row justify-start items-center w-full">
             <Input
-              autoFocus
-              ref={(input) => input && input.focus()}
-              placeholder="... press enter ⏎ to send"
+              // autoFocus
+              ref={inputBox}
+              placeholder="... press enter ⏎ to send, or use / to invoke prompt"
               value={userInput}
+              onBlur={(e) => {
+                console.log('Blur', e.relatedTarget?.id);
+                if (e.relatedTarget?.id === 'promptSheet') {
+                  return;
+                }
+                e.target.focus();
+              }}
               onChange={(e) => {
                 setHistoryNextIndex(0);
                 setUserInput(e.target.value);
               }}
               onKeyDown={handleKeyDown}
-              disabled={waiting}
+              disabled={waiting || promptOpen}
               className="grow text-ellipsis overflow-clip pl-10 pr-8 h-12 text-xl placeholder:text-lg placeholder:font-light shadow-md"
             />
             <User ready={userInput.length > 0 && !waiting} />
@@ -194,6 +283,7 @@ function Spotlight() {
           <div className="relative flex flex-row justify-start items-center w-full">
             <Input
               autoFocus
+              type="password"
               ref={(input) => input && input.focus()}
               placeholder="your Open AI key..., press enter ⏎ to save locally"
               value={openAIKey}
@@ -218,10 +308,96 @@ function Spotlight() {
             <Drag />
           </div>
         )}
-        <div className="relative w-full group grow">
+        {promptOpen && (
+          <div
+            id="promptSheet"
+            className="mt-1 p-1 max-h-[176px] w-full border-2 shadow-md rounded-md overflow-y-scroll scrollbar-w-2 scrollbar-thumb-blue scrollbar-thumb-rounded"
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setPromptSelect(promptSelect ? promptSelect - 1 : 0);
+                return;
+              }
+              if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const promptLength = Object.keys(promptDict).length;
+                setPromptSelect(
+                  promptSelect < promptLength ? promptSelect + 1 : promptLength,
+                );
+                return;
+              }
+              if (e.key === 'Escape') {
+                setPromptOpen(false);
+                return;
+              }
+            }}
+          >
+            <div className="w-full flex flex-col justify-start items-center gap-0.5">
+              <Button
+                id="promptSheet"
+                ref={(button) => promptSelect === 0 && button && button.focus()}
+                size="sm"
+                className="w-full text-start"
+                variant="ghost"
+                key={0}
+                onClick={() => handlePromptSheetAdd()}
+              >
+                <Plus />
+              </Button>
+              {Object.keys(promptDict).map((key, index) => {
+                const indexR = index + 1;
+                return (
+                  <div
+                    className="w-full relative flex flex-row items-center"
+                    key={key}
+                  >
+                    <Button
+                      id="promptSheet"
+                      ref={(button) =>
+                        promptSelect === indexR && button && button.focus()
+                      }
+                      className={cn(
+                        'grow flex flex-row justify-start items-center',
+                        indexR % 2 ? ' bg-muted' : '',
+                      )}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        console.log('Clicked');
+                        handlePromptClick(key);
+                      }}
+                    >
+                      <span className="font-semibold mr-1">{key}</span>
+                      <span className="grow overflow-x-clip text-ellipsis font-normal text-zinc-500 whitespace-nowrap text-start">
+                        {promptDict[key]}
+                      </span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute w-5 h-5 right-1 text-zinc-500"
+                      onClick={() => {
+                        setPromptOpen(false);
+                        if (indexR === promptSelect) {
+                          setPromptSelect(0);
+                        }
+                        window.utils.deletePrompt(key);
+                        delete promptDict[key];
+                        setPromptDict(promptDict);
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        <div className="relative w-full group grow mt-1">
           <Textarea
             ref={outputPane}
-            maxRows={20}
+            maxRows={18}
             minRows={1}
             value={aiResponse}
             // TODO how to focus at the end of the line when generating?
@@ -268,7 +444,7 @@ function Spotlight() {
                     onClick={() => {
                       setAiResponse('');
                     }}
-                    disabled={!aiResponse || waiting}
+                    disabled={!aiResponse || waiting || !openaiKeyAlready}
                   >
                     <Eraser className="w-4 h-4" />
                   </Button>
@@ -303,7 +479,7 @@ function Spotlight() {
                     onClick={() => {
                       handleCopy(aiResponse);
                     }}
-                    disabled={!aiResponse || waiting}
+                    disabled={!aiResponse || waiting || !openaiKeyAlready}
                   >
                     {copied ? (
                       <CopyCheck className="w-4 h-4" />

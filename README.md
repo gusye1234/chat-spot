@@ -22,7 +22,9 @@ By default, anything said by ChatSpot will be automatically copied. So all you n
 2. Ask question and wait the streaming output finished
 3. Untoggle ChatSpot with gobal shortcut  `command/ctrl + alt + k`, and the focus will be back to your previsous working place, where you can paste the response from ChatGPT
 
+ChatSpot also supports custom prompts. You can use "/" to invoke a window customized with your prompt.
 
+![prompt](./docs/prompt.png)
 
 ## Get Started
 

@@ -3,8 +3,10 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import Store from 'electron-store';
 import electron from 'electron';
-export type Channels = 'resize-window';
+
 const store = new Store();
+export type Channels = 'resize-window' | 'reset-openai-key';
+export type PromptDict = Record<string, string>;
 
 const electronHandler = {
   ipcRenderer: {
@@ -36,6 +38,19 @@ const electronHandler = {
 };
 
 const utilsHandler = {
+  addPrompt(promptName: string, promptContent: string) {
+    store.set(`prompt.${promptName}`, promptContent);
+  },
+  getPrompts() {
+    const data = store.get('prompt');
+    if (!data) {
+      return {} as PromptDict;
+    }
+    return data as PromptDict;
+  },
+  deletePrompt(promptName: string) {
+    store.delete(`prompt.${promptName}`);
+  },
   clipboardWrite(content: string) {
     electron.clipboard.writeText(content);
   },

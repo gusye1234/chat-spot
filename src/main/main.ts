@@ -25,6 +25,10 @@ import MenuBuilder from './menu';
 import Store from 'electron-store';
 import { resolveHtmlPath } from './util';
 
+const store = new Store();
+let mainWindow: BrowserWindow | null = null;
+let mainWindowShown = true;
+
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -41,9 +45,22 @@ const getAssetPath = (...paths: string[]): string => {
   return path.join(RESOURCES_PATH, ...paths);
 };
 
-Store.initRenderer();
-let mainWindow: BrowserWindow | null = null;
-let mainWindowShown = true;
+const toggleWindow = () => {
+  if (mainWindow) {
+    // make sure show/hide will return the focus to the previous app
+    // https://stackoverflow.com/questions/50642126/previous-window-focus-electron
+    if (mainWindowShown) {
+      mainWindow.minimize();
+      mainWindow.hide();
+      if (process.platform === 'darwin') app.hide();
+    } else {
+      mainWindow.show();
+      mainWindow.restore();
+    }
+  } else {
+    createWindow();
+  }
+};
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -140,16 +157,18 @@ const createWindow = async () => {
   new AppUpdater();
 };
 
-ipcMain.on('resize-window', (event, arg) => {
-  console.log('Get resize', arg);
-  if (mainWindow) mainWindow.setSize(arg.width, arg.height);
-});
-/**
- * Add event listeners...
- */
 if (process.platform === 'darwin') {
   app.dock.hide();
 }
+
+/**
+ * Add event listeners...
+ */
+ipcMain.on('resize-window', (event, arg) => {
+  console.log('resize', arg);
+  if (mainWindow) mainWindow.setSize(mainWindow.getSize()[0], arg.height);
+  // if (mainWindow) mainWindow.setSize(arg.width, arg.height);
+});
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -163,23 +182,6 @@ app.on('quit', () => {
   console.log('Quitting ChatSpot');
   globalShortcut.unregister('CommandOrControl+Alt+K');
 });
-
-const toggleWindow = () => {
-  if (mainWindow) {
-    // make sure show/hide will return the focus to the previous app
-    // https://stackoverflow.com/questions/50642126/previous-window-focus-electron
-    if (mainWindowShown) {
-      mainWindow.minimize();
-      mainWindow.hide();
-      if (process.platform === 'darwin') app.hide();
-    } else {
-      mainWindow.show();
-      mainWindow.restore();
-    }
-  } else {
-    createWindow();
-  }
-};
 
 app
   .whenReady()
@@ -195,6 +197,15 @@ app
         label: 'ChatSpot',
       },
       { type: 'separator' },
+      {
+        label: 'Reset OpenAI key',
+        click: () => {
+          if (mainWindow) {
+            store.delete('OpenAIKey');
+            mainWindow.webContents.send('reset-openai-key');
+          }
+        },
+      },
       {
         label: 'Toggle',
         accelerator: 'CommandOrControl+Alt+K',
