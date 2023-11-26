@@ -2,14 +2,23 @@
   <h1>ChatSpot🥸</h1>
   <p><strong>Spotlight app for ChatGPT</strong></p>
     <p>
-    <a href="https://github.com/gusye1234/chat-spot">
-      <img src="https://img.shields.io/badge/version-beta-blue">
+    <a href="https://github.com/gusye1234/chat-spot/releases/tag/v0.0.1">
+      <img src="https://img.shields.io/badge/version-v0.0.1 beta-blue">
+    </a>
+          <a href="https://github.com/gusye1234/chat-spot/actions?query=workflow%3APublish">
+      <img src="https://github.com/gusye1234/chat-spot/actions/workflows/build.yml/badge.svg">
     </a>
     <a href="https://github.com/gusye1234/chat-spot">
       <img src="https://img.shields.io/badge/platform-macOS-green">
     </a>
+          <a href="https://github.com/gusye1234/chat-spot">
+      <img src="https://img.shields.io/badge/platform-windows-green">
+    </a>
   </p>
 </div>
+
+
+
 
 
 <p align="center">
