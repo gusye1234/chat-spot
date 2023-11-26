@@ -35,7 +35,7 @@ Download the app
 | Platform | Tested Supports    | Download                                                     |
 | -------- | ------------------ | ------------------------------------------------------------ |
 | MacOS    | Support 13.5.2+    | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.1) |
-| Windows  | Haven't tested yet | /                                                            |
+| Windows  | Haven't tested yet | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.1) |
 | Linux    | Haven't tested yet | /                                                            |
 
 
