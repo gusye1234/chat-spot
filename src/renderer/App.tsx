@@ -35,9 +35,15 @@ import {
 } from '@/components/ui/tooltip';
 
 let openaiUserKey = window.electron.openai.openaiKey;
-
+let openaiModel = window.electron.openai.openaiModel;
 window.electron.ipcRenderer.on('reset-openai-key', () => {
   openaiUserKey = '';
+  window.location.reload();
+  console.log('Calling');
+});
+
+window.electron.ipcRenderer.on('reload-openai-model', () => {
+  openaiUserKey = window.electron.openai.openaiModel;
   window.location.reload();
   console.log('Calling');
 });
@@ -142,7 +148,7 @@ prompt: ${content}`);
     let currentResponse = '';
     try {
       const stream = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo-0613',
+        model: openaiModel,
         messages: [
           {
             role: 'system',
@@ -416,7 +422,7 @@ prompt: ${content}`);
                   <Bot waiting={waiting} />
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p>ChatSpot Assistant</p>
+                  <p className="text-xs italic text-muted">{openaiModel}</p>
                 </TooltipContent>
               </Tooltip>
               {window.utils.isDebug && (

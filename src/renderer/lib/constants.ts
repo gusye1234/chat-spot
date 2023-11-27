@@ -11,6 +11,7 @@ Below is a introduction(i.e. readme) of ChatSpot project, if anyone needs some d
 * Users can use Up/Down arrow keys to browse the questions history.
 * Users can use key: '/' to invoke their own prompt.
 * If you're using ChatSpot in MacOS, you can check more details in the menu bar, ChatSpot have a icon there.
+* You can change the current AI model in the menu bar.
 ## Project credits
 ChatSpot app is developed by \`gusye1234\`, and this app is open sourced in Github: https://github.com/gusye1234/chat-spot.
 ### Contributors

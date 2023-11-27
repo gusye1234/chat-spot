@@ -207,6 +207,33 @@ app
         },
       },
       {
+        label: 'Change AI',
+        submenu: [
+          {
+            label: 'GPT-3.5',
+            checked: true,
+            type: 'radio',
+            click: () => {
+              if (mainWindow) {
+                store.set('OpenAIModel', 'gpt-3.5-turbo-1106');
+                mainWindow.webContents.send('reload-openai-model');
+              }
+            },
+          },
+          {
+            label: 'GPT-4',
+            checked: false,
+            type: 'radio',
+            click: () => {
+              if (mainWindow) {
+                store.set('OpenAIModel', 'gpt-4-1106-preview');
+                mainWindow.webContents.send('reload-openai-model');
+              }
+            },
+          },
+        ],
+      },
+      {
         label: 'Toggle',
         accelerator: 'CommandOrControl+Alt+K',
         click: () => {

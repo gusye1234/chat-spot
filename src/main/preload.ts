@@ -5,7 +5,10 @@ import Store from 'electron-store';
 import electron from 'electron';
 
 const store = new Store();
-export type Channels = 'resize-window' | 'reset-openai-key';
+export type Channels =
+  | 'resize-window'
+  | 'reset-openai-key'
+  | 'reload-openai-model';
 export type PromptDict = Record<string, string>;
 
 const electronHandler = {
@@ -28,6 +31,7 @@ const electronHandler = {
   },
   openai: {
     openaiKey: (store.get('OpenAIKey') as string) ?? '',
+    openaiModel: (store.get('OpenAIModel') as string) ?? 'gpt-3.5-turbo-1106',
     saveOpenAIKey(key: string) {
       store.set('OpenAIKey', key);
     },
