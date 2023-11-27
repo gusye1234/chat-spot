@@ -44,7 +44,11 @@ ChatSpot also supports custom prompts. You can use "/" to invoke a window custom
 </p>
 
 
+You can checkout details shortcuts and other functions in the menu bar:
 
+<p align="center">
+  <img src="https://github.com/gusye1234/chat-spot/releases/download/v0.0.2/menu.jpg" alt="prompt" style="border-radius:10px;">
+</p>
 
 ## Get Started
 
