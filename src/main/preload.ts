@@ -1,6 +1,6 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
-import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { contextBridge, ipcRenderer, IpcRendererEvent, shell } from 'electron';
 import Store from 'electron-store';
 import electron from 'electron';
 
@@ -8,7 +8,11 @@ const store = new Store();
 export type Channels =
   | 'resize-window'
   | 'reset-openai-key'
-  | 'reload-openai-model';
+  | 'reload-openai-model'
+  | 'open-window'
+  | 'take-shot'
+  | 'open-dev-mode'
+  | 'open-image';
 export type PromptDict = Record<string, string>;
 
 const electronHandler = {
@@ -27,6 +31,9 @@ const electronHandler = {
     },
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
+    },
+    removeAllListeners(channel: Channels) {
+      ipcRenderer.removeAllListeners(channel);
     },
   },
   openai: {
@@ -57,6 +64,10 @@ const utilsHandler = {
   },
   clipboardWrite(content: string) {
     electron.clipboard.writeText(content);
+  },
+  openUrl(url: string) {
+    console.log('Opening', url.slice(0, 50));
+    shell.openExternal('https://github.com', { activate: true });
   },
   isDebug:
     process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true',

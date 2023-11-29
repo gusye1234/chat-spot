@@ -18,14 +18,18 @@ import {
   Tray,
   Menu,
   nativeImage,
+  desktopCapturer,
 } from 'electron';
+import Screenshots from 'electron-screenshots';
+import fs from 'fs';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
+// import MenuBuilder from './menu';
 import Store from 'electron-store';
 import { resolveHtmlPath } from './util';
 
 const store = new Store();
+let screenshot: Screenshots | null = null;
 let mainWindow: BrowserWindow | null = null;
 let mainWindowShown = true;
 
@@ -54,6 +58,7 @@ const toggleWindow = () => {
       mainWindow.hide();
       if (process.platform === 'darwin') app.hide();
     } else {
+      mainWindow.webContents.send('open-window');
       mainWindow.show();
       mainWindow.restore();
     }
@@ -61,6 +66,49 @@ const toggleWindow = () => {
     createWindow();
   }
 };
+
+const screenShot = () => {
+  if (screenshot) {
+    screenshot.startCapture();
+  }
+  // desktopCapturer
+  //   .getSources({
+  //     types: ['screen'],
+  //     thumbnailSize: {
+  //       width: 640,
+  //       height: 480,
+  //     },
+  //   })
+  //   .then(async (sources) => {
+  //     const source = sources[0];
+  //     // const image = source.thumbnail.toPNG();
+  //     // console.log(source.thumbnail.toDataURL().slice(0, 100));
+  //     if (mainWindow) {
+  //       mainWindow.webContents.send('take-shot', source.thumbnail.toDataURL());
+  //     }
+  //   });
+};
+
+// Function to save data URL to a file and open it
+function openImageFromDataUrl(dataUrl: string) {
+  // Convert the data URL to a native image
+  const image = nativeImage.createFromDataURL(dataUrl);
+  // Get the image as a Buffer
+  const imageBuffer = image.toPNG();
+
+  // Generate a file path
+  const filePath = path.join(app.getPath('temp'), 'temp-image.png');
+
+  // Write the file to the file system
+  fs.writeFile(filePath, imageBuffer, (err: any) => {
+    if (err) throw err;
+
+    // Open the image file with the default image viewer
+    shell.openPath(filePath).catch((err) => {
+      console.error('Failed to open image:', err);
+    });
+  });
+}
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -100,7 +148,7 @@ const createWindow = async () => {
     focusable: true,
     frame: false,
     transparent: true,
-    resizable: false,
+    resizable: isDebug,
     skipTaskbar: process.platform === 'win32',
     icon: getAssetPath('icon.png'),
     webPreferences: {
@@ -143,8 +191,8 @@ const createWindow = async () => {
     }
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
+  // const menuBuilder = new MenuBuilder(mainWindow);
+  // menuBuilder.buildMenu();
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -155,6 +203,32 @@ const createWindow = async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
+};
+
+const createScreenshotWindow = () => {
+  screenshot = new Screenshots({ singleWindow: true });
+
+  screenshot.on('ok', (e, buffer, bounds) => {
+    const imageBuffer = Buffer.from(buffer);
+    const image = nativeImage.createFromBuffer(imageBuffer);
+    const imageUrl = image.toDataURL();
+    console.log('capture', imageUrl.slice(0, 20));
+    if (mainWindow) {
+      mainWindow.webContents.send('take-shot', imageUrl);
+    }
+  });
+
+  screenshot.on('save', (e, buffer, bounds) => {
+    e.preventDefault();
+    const imageBuffer = Buffer.from(buffer);
+    const image = nativeImage.createFromBuffer(imageBuffer);
+    const imageUrl = image.toDataURL();
+    console.log('capture', imageUrl.slice(0, 20));
+    if (mainWindow) {
+      mainWindow.webContents.send('take-shot', imageUrl);
+    }
+    screenshot?.endCapture();
+  });
 };
 
 if (process.platform === 'darwin') {
@@ -168,6 +242,14 @@ ipcMain.on('resize-window', (event, arg) => {
   console.log('resize', arg);
   if (mainWindow) mainWindow.setSize(mainWindow.getSize()[0], arg.height);
   // if (mainWindow) mainWindow.setSize(arg.width, arg.height);
+});
+
+ipcMain.on('open-dev-mode', (event) => {
+  if (mainWindow && isDebug) mainWindow.webContents.openDevTools();
+});
+
+ipcMain.on('open-image', (event, dataUrl) => {
+  openImageFromDataUrl(dataUrl);
 });
 
 app.on('window-all-closed', () => {
@@ -186,6 +268,7 @@ app.on('quit', () => {
 app
   .whenReady()
   .then(() => {
+    createScreenshotWindow();
     const appIcon = new Tray(
       nativeImage.createFromPath(getAssetPath('icon.png')).resize({
         width: 18,
@@ -245,6 +328,12 @@ app
         accelerator: 'Command+Q',
         click: () => {
           app.quit();
+        },
+      },
+      {
+        label: 'Shots',
+        click: () => {
+          screenShot();
         },
       },
     ]);

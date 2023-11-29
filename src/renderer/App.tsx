@@ -39,13 +39,11 @@ let openaiModel = window.electron.openai.openaiModel;
 window.electron.ipcRenderer.on('reset-openai-key', () => {
   openaiUserKey = '';
   window.location.reload();
-  console.log('Calling');
 });
 
 window.electron.ipcRenderer.on('reload-openai-model', () => {
   openaiUserKey = window.electron.openai.openaiModel;
   window.location.reload();
-  console.log('Calling');
 });
 
 function Spotlight() {
@@ -56,6 +54,7 @@ function Spotlight() {
   // );
   const openaiKeyAlready = validateOpenAIKey(openaiUserKey);
   const [userInput, setUserInput] = useState('');
+  const [imageInput, setImageInput] = useState('');
   const [promptOpen, setPromptOpen] = useState(false);
   const [promptSelect, setPromptSelect] = useState(0);
   const [waiting, setWaiting] = useState(false);
@@ -77,6 +76,28 @@ function Spotlight() {
     apiKey: openaiUserKey,
     dangerouslyAllowBrowser: true,
   });
+
+  useEffect(() => {
+    window.electron.ipcRenderer.on('open-window', () => {
+      if (inputBox.current) {
+        inputBox.current.focus();
+      }
+      return () => {
+        window.electron.ipcRenderer.removeAllListeners('open-window');
+      };
+    });
+  }, []);
+
+  useEffect(() => {
+    const cancelListen = window.electron.ipcRenderer.on(
+      'take-shot',
+      async (...args) => {
+        const image = args[0] as string;
+        setImageInput(image);
+      },
+    );
+    return cancelListen;
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -147,18 +168,50 @@ prompt: ${content}`);
     setAiResponse(thinkingPrompt);
     let currentResponse = '';
     try {
-      const stream = await openai.chat.completions.create({
-        model: openaiModel,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          { role: 'user', content: userInput },
-        ],
-        temperature: 0.1,
-        stream: true,
-      });
+      let stream;
+      if (!imageInput) {
+        stream = await openai.chat.completions.create({
+          model: openaiModel,
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt,
+            },
+            { role: 'user', content: userInput },
+          ],
+          temperature: 0.1,
+          stream: true,
+        });
+      } else {
+        stream = await openai.chat.completions.create({
+          model: 'gpt-4-vision-preview',
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt,
+            },
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: userInput,
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: imageInput,
+                  },
+                },
+              ],
+            },
+          ],
+          temperature: 0.1,
+          max_tokens: 2400,
+          stream: true,
+        });
+      }
+
       for await (const chunk of stream) {
         currentResponse += chunk.choices[0]?.delta?.content || '';
         setAiResponse(currentResponse);
@@ -166,6 +219,7 @@ prompt: ${content}`);
           break;
         }
       }
+
       //console.log("response", result.data.choices[0].text);
     } catch (e) {
       //console.log(e);
@@ -263,17 +317,10 @@ prompt: ${content}`);
         {openaiKeyAlready ? (
           <div className="relative flex flex-row justify-start items-center w-full">
             <Input
-              // autoFocus
+              autoFocus
               ref={inputBox}
               placeholder="... press enter ⏎ to send, or use / to invoke prompt"
               value={userInput}
-              onBlur={(e) => {
-                console.log('Blur', e.relatedTarget?.id);
-                if (e.relatedTarget?.id === 'promptSheet') {
-                  return;
-                }
-                e.target.focus();
-              }}
               onChange={(e) => {
                 setHistoryNextIndex(0);
                 setUserInput(e.target.value);
@@ -400,18 +447,13 @@ prompt: ${content}`);
             </div>
           </div>
         )}
-        <div className="relative w-full group grow mt-1">
+        <div className="relative w-full grow mt-1">
           <Textarea
             ref={outputPane}
             maxRows={18}
             minRows={1}
             value={aiResponse}
             // TODO how to focus at the end of the line when generating?
-            // onChange={() => {
-            //   if (outputPane && outputPane.current) {
-            //     outputPane.current.focus();
-            //   }
-            // }}
             placeholder={openaiKeyAlready ? greetingPrompt : cantGreetingPrompt}
             className="w-full resize-none pt-10 px-2 scrollbar-w-2 scrollbar-track-blue-lighter scrollbar-thumb-blue scrollbar-thumb-rounded font-sans font-semibold text-sm text-zinc-500 shadow-md overflow-visible"
           />
@@ -429,13 +471,42 @@ prompt: ${content}`);
                 <Tooltip>
                   <TooltipTrigger>
                     <div className="bg-secondary p-1 rounded-md">
-                      <BugPlay className="w-4 h-4 text-zinc-500" />
+                      <BugPlay
+                        className="w-4 h-4 text-zinc-500"
+                        onClick={() => {
+                          window.electron.ipcRenderer.sendMessage(
+                            'open-dev-mode',
+                          );
+                        }}
+                      />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="right">
                     <p>Dev mode</p>
                   </TooltipContent>
                 </Tooltip>
+              )}
+              {imageInput && (
+                <div className="relative group">
+                  <X
+                    className="absolute -top-1 -right-1 bg-secondary rounded-full w-4 h-4 invisible group-hover:visible cursor-pointer"
+                    onClick={() => {
+                      setImageInput('');
+                    }}
+                  />
+                  <img
+                    src={imageInput}
+                    alt="screen shot"
+                    className="w-7 h-7 rounded-md border-2 border-blue-500 shadow-lg cursor-pointer"
+                    onClick={() => {
+                      window.electron.ipcRenderer.sendMessage(
+                        'open-image',
+                        imageInput,
+                      );
+                      handleCopy(imageInput);
+                    }}
+                  />
+                </div>
               )}
             </div>
           </TooltipProvider>
