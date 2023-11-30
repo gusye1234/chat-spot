@@ -18,7 +18,7 @@ import {
   Tray,
   Menu,
   nativeImage,
-  desktopCapturer,
+  NativeImage,
 } from 'electron';
 import Screenshots from 'electron-screenshots';
 import fs from 'fs';
@@ -49,18 +49,30 @@ const getAssetPath = (...paths: string[]): string => {
   return path.join(RESOURCES_PATH, ...paths);
 };
 
+const openWindow = () => {
+  if (mainWindow) {
+    mainWindow.webContents.send('open-window');
+    mainWindow.show();
+    mainWindow.restore();
+  }
+};
+
+const closeWindow = () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+    mainWindow.hide();
+    if (process.platform === 'darwin') app.hide();
+  }
+};
+
 const toggleWindow = () => {
   if (mainWindow) {
     // make sure show/hide will return the focus to the previous app
     // https://stackoverflow.com/questions/50642126/previous-window-focus-electron
     if (mainWindowShown) {
-      mainWindow.minimize();
-      mainWindow.hide();
-      if (process.platform === 'darwin') app.hide();
+      closeWindow();
     } else {
-      mainWindow.webContents.send('open-window');
-      mainWindow.show();
-      mainWindow.restore();
+      openWindow();
     }
   } else {
     createWindow();
@@ -68,25 +80,10 @@ const toggleWindow = () => {
 };
 
 const screenShot = () => {
-  if (screenshot) {
+  if (screenshot && mainWindow) {
+    closeWindow();
     screenshot.startCapture();
   }
-  // desktopCapturer
-  //   .getSources({
-  //     types: ['screen'],
-  //     thumbnailSize: {
-  //       width: 640,
-  //       height: 480,
-  //     },
-  //   })
-  //   .then(async (sources) => {
-  //     const source = sources[0];
-  //     // const image = source.thumbnail.toPNG();
-  //     // console.log(source.thumbnail.toDataURL().slice(0, 100));
-  //     if (mainWindow) {
-  //       mainWindow.webContents.send('take-shot', source.thumbnail.toDataURL());
-  //     }
-  //   });
 };
 
 // Function to save data URL to a file and open it
@@ -205,28 +202,44 @@ const createWindow = async () => {
   new AppUpdater();
 };
 
+const sendImageToRenderer = (image: NativeImage) => {
+  const imageUrl = image.toDataURL();
+  if (mainWindow) {
+    mainWindow.webContents.send('take-shot', imageUrl);
+    openWindow();
+  }
+};
+
 const createScreenshotWindow = () => {
-  screenshot = new Screenshots({ singleWindow: true });
+  screenshot = new Screenshots({
+    singleWindow: true,
+    lang: {
+      magnifier_position_label: 'Position',
+      operation_ok_title: 'Ok',
+      operation_cancel_title: 'Cancel',
+      operation_save_title: 'Save',
+      operation_redo_title: 'Redo',
+      operation_undo_title: 'Undo',
+      operation_mosaic_title: 'Mosaic',
+      operation_text_title: 'Text',
+      operation_brush_title: 'Brush',
+      operation_arrow_title: 'Arrow',
+      operation_ellipse_title: 'Circle',
+      operation_rectangle_title: 'Rectangle',
+    },
+  });
 
   screenshot.on('ok', (e, buffer, bounds) => {
     const imageBuffer = Buffer.from(buffer);
     const image = nativeImage.createFromBuffer(imageBuffer);
-    const imageUrl = image.toDataURL();
-    console.log('capture', imageUrl.slice(0, 20));
-    if (mainWindow) {
-      mainWindow.webContents.send('take-shot', imageUrl);
-    }
+    sendImageToRenderer(image);
   });
 
   screenshot.on('save', (e, buffer, bounds) => {
     e.preventDefault();
     const imageBuffer = Buffer.from(buffer);
     const image = nativeImage.createFromBuffer(imageBuffer);
-    const imageUrl = image.toDataURL();
-    console.log('capture', imageUrl.slice(0, 20));
-    if (mainWindow) {
-      mainWindow.webContents.send('take-shot', imageUrl);
-    }
+    sendImageToRenderer(image);
     screenshot?.endCapture();
   });
 };
@@ -252,6 +265,10 @@ ipcMain.on('open-image', (event, dataUrl) => {
   openImageFromDataUrl(dataUrl);
 });
 
+ipcMain.on('open-screenshot', (event) => {
+  screenShot();
+});
+
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -263,6 +280,7 @@ app.on('window-all-closed', () => {
 app.on('quit', () => {
   console.log('Quitting ChatSpot');
   globalShortcut.unregister('CommandOrControl+Alt+K');
+  // globalShortcut.unregister('CommandOrControl+Alt+L');
 });
 
 app
@@ -317,6 +335,12 @@ app
         ],
       },
       {
+        label: 'Take screenshot',
+        click: () => {
+          screenShot();
+        },
+      },
+      {
         label: 'Toggle',
         accelerator: 'CommandOrControl+Alt+K',
         click: () => {
@@ -325,15 +349,9 @@ app
       },
       {
         label: 'Quit',
-        accelerator: 'Command+Q',
+        accelerator: 'CommandOrControl+Q',
         click: () => {
           app.quit();
-        },
-      },
-      {
-        label: 'Shots',
-        click: () => {
-          screenShot();
         },
       },
     ]);
@@ -346,6 +364,7 @@ app
       if (mainWindow === null) createWindow();
     });
     const ret = globalShortcut.register('CommandOrControl+Alt+K', toggleWindow);
+    // const scr = globalShortcut.register('CommandOrControl+Alt+L', screenShot);
 
     if (!ret) {
       console.log('registration failed');

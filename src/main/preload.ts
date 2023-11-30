@@ -12,7 +12,8 @@ export type Channels =
   | 'open-window'
   | 'take-shot'
   | 'open-dev-mode'
-  | 'open-image';
+  | 'open-image'
+  | 'open-screenshot';
 export type PromptDict = Record<string, string>;
 
 const electronHandler = {

@@ -28,6 +28,14 @@ const configuration: webpack.Configuration = {
           },
         },
       },
+      {
+        test: /.node$/,
+        use: 'node-loader',
+      },
+      {
+        test: /.html$/,
+        use: 'html-loader',
+      },
     ],
   },
 
