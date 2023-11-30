@@ -7,7 +7,12 @@ settings:
 dependencies:
   electron-screenshots:
     specifier: ^0.5.26
-    version: registry.npmmirror.com/electron-screenshots@0.5.26(electron@27.1.0)(react-dom@18.2.0)(react@18.2.0)
+    version: registry.npmmirror.com/electron-screenshots@0.5.26(electron@27.1.2)(react-dom@18.2.0)(react@18.2.0)
+
+devDependencies:
+  '@types/debug':
+    specifier: ^4.1.12
+    version: registry.npmmirror.com/@types/debug@4.1.12
 
 packages:
 
@@ -53,9 +58,17 @@ packages:
     dependencies:
       '@types/http-cache-semantics': registry.npmmirror.com/@types/http-cache-semantics@4.0.4
       '@types/keyv': registry.npmmirror.com/@types/keyv@3.1.4
-      '@types/node': registry.npmmirror.com/@types/node@18.18.12
+      '@types/node': registry.npmmirror.com/@types/node@18.18.14
       '@types/responselike': registry.npmmirror.com/@types/responselike@1.0.3
     dev: false
+
+  registry.npmmirror.com/@types/debug@4.1.12:
+    resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/debug/-/debug-4.1.12.tgz}
+    name: '@types/debug'
+    version: 4.1.12
+    dependencies:
+      '@types/ms': registry.npmmirror.com/@types/ms@0.7.34
+    dev: true
 
   registry.npmmirror.com/@types/http-cache-semantics@4.0.4:
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/http-cache-semantics/-/http-cache-semantics-4.0.4.tgz}
@@ -68,13 +81,19 @@ packages:
     name: '@types/keyv'
     version: 3.1.4
     dependencies:
-      '@types/node': registry.npmmirror.com/@types/node@18.18.12
+      '@types/node': registry.npmmirror.com/@types/node@18.18.14
     dev: false
 
-  registry.npmmirror.com/@types/node@18.18.12:
-    resolution: {integrity: sha512-G7slVfkwOm7g8VqcEF1/5SXiMjP3Tbt+pXDU3r/qhlM2KkGm786DUD4xyMA2QzEElFrv/KZV9gjygv4LnkpbMQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/node/-/node-18.18.12.tgz}
+  registry.npmmirror.com/@types/ms@0.7.34:
+    resolution: {integrity: sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/ms/-/ms-0.7.34.tgz}
+    name: '@types/ms'
+    version: 0.7.34
+    dev: true
+
+  registry.npmmirror.com/@types/node@18.18.14:
+    resolution: {integrity: sha512-iSOeNeXYNYNLLOMDSVPvIFojclvMZ/HDY2dU17kUlcsOsSQETbWIslJbYLZgA+ox8g2XQwSHKTkght1a5X26lQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/node/-/node-18.18.14.tgz}
     name: '@types/node'
-    version: 18.18.12
+    version: 18.18.14
     dependencies:
       undici-types: registry.npmmirror.com/undici-types@5.26.5
     dev: false
@@ -84,7 +103,7 @@ packages:
     name: '@types/responselike'
     version: 1.0.3
     dependencies:
-      '@types/node': registry.npmmirror.com/@types/node@18.18.12
+      '@types/node': registry.npmmirror.com/@types/node@18.18.14
     dev: false
 
   registry.npmmirror.com/@types/yauzl@2.10.3:
@@ -93,7 +112,7 @@ packages:
     version: 2.10.3
     requiresBuild: true
     dependencies:
-      '@types/node': registry.npmmirror.com/@types/node@18.18.12
+      '@types/node': registry.npmmirror.com/@types/node@18.18.14
     dev: false
     optional: true
 
@@ -205,7 +224,7 @@ packages:
     dev: false
     optional: true
 
-  registry.npmmirror.com/electron-screenshots@0.5.26(electron@27.1.0)(react-dom@18.2.0)(react@18.2.0):
+  registry.npmmirror.com/electron-screenshots@0.5.26(electron@27.1.2)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-btr1S8arUt+rqVjgiY4+hdi9DQJGCYHG9x0A3n3rrJvCaet7XnRRnEULXDLtY86CZHeg7JsQzeMdQ4Lj2Bu8lQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/electron-screenshots/-/electron-screenshots-0.5.26.tgz}
     id: registry.npmmirror.com/electron-screenshots/0.5.26
     name: electron-screenshots
@@ -214,7 +233,7 @@ packages:
       electron: '>=14'
     dependencies:
       debug: registry.npmmirror.com/debug@4.3.4
-      electron: registry.npmmirror.com/electron@27.1.0
+      electron: registry.npmmirror.com/electron@27.1.2
       fs-extra: registry.npmmirror.com/fs-extra@11.2.0
       node-screenshots: registry.npmmirror.com/node-screenshots@0.1.9
       react-screenshots: registry.npmmirror.com/react-screenshots@0.5.22(react-dom@18.2.0)(react@18.2.0)
@@ -224,16 +243,16 @@ packages:
       - supports-color
     dev: false
 
-  registry.npmmirror.com/electron@27.1.0:
-    resolution: {integrity: sha512-XPdJiO475QJ8cx59/goWNNWnlV0vab+Ut3occymos7VDxkHV5mFrlW6tcGi+M3bW6gBfwpJocWMng8tw542vww==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/electron/-/electron-27.1.0.tgz}
+  registry.npmmirror.com/electron@27.1.2:
+    resolution: {integrity: sha512-Dy6BUuGLiIJv+zfsXwr78TV2TNppi24rXF4PIIS+OjDblEKdkI9r1iM8JUd3/x3sbGUy5mdLMSPhvmu//IhkgA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/electron/-/electron-27.1.2.tgz}
     name: electron
-    version: 27.1.0
+    version: 27.1.2
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
     dependencies:
       '@electron/get': registry.npmmirror.com/@electron/get@2.0.3
-      '@types/node': registry.npmmirror.com/@types/node@18.18.12
+      '@types/node': registry.npmmirror.com/@types/node@18.18.14
       extract-zip: registry.npmmirror.com/extract-zip@2.0.1
     transitivePeerDependencies:
       - supports-color

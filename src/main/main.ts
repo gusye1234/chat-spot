@@ -18,7 +18,6 @@ import {
   Tray,
   Menu,
   nativeImage,
-  desktopCapturer,
 } from 'electron';
 import Screenshots from 'electron-screenshots';
 import fs from 'fs';
