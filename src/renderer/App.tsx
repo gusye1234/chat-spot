@@ -14,6 +14,7 @@ import {
   Eraser,
   Plus,
   X,
+  Camera,
 } from 'lucide-react';
 import { cn, validateOpenAIKey } from './lib/utils';
 import { OpenAI } from 'openai';
@@ -26,7 +27,7 @@ import {
   addPromptTemplate,
   addPromptHint,
 } from './lib/constants';
-import { User, Bot, Drag } from './components/icons';
+import { User, Bot } from './components/icons';
 import {
   Tooltip,
   TooltipContent,
@@ -330,7 +331,15 @@ prompt: ${content}`);
               className="grow text-ellipsis overflow-clip pl-10 pr-8 h-12 text-xl placeholder:text-lg placeholder:font-light shadow-md"
             />
             <User ready={userInput.length > 0 && !waiting} />
-            <Drag />
+            <Button
+              className="absolute right-1 text-zinc-500 px-1 rounded-md text-center flex justify-center items-center"
+              variant="ghost"
+              onClick={() => {
+                window.electron.ipcRenderer.sendMessage('open-screenshot');
+              }}
+            >
+              <Camera className="w-6 h-6" />
+            </Button>
           </div>
         ) : (
           <div className="relative flex flex-row justify-start items-center w-full">
@@ -358,7 +367,6 @@ prompt: ${content}`);
               className="grow text-ellipsis overflow-clip pl-10 h-12 text-xl placeholder:text-lg placeholder:font-light shadow-md"
             />
             <User ready={validateOpenAIKey(openAIKey)} />
-            <Drag />
           </div>
         )}
         {promptOpen && (
@@ -487,7 +495,7 @@ prompt: ${content}`);
                 </Tooltip>
               )}
               {imageInput && (
-                <div className="relative group">
+                <div className="relative group w-7 h-7">
                   <X
                     className="absolute -top-1 -right-1 bg-secondary rounded-full w-4 h-4 invisible group-hover:visible cursor-pointer"
                     onClick={() => {
@@ -497,7 +505,7 @@ prompt: ${content}`);
                   <img
                     src={imageInput}
                     alt="screen shot"
-                    className="w-7 h-7 rounded-md border-2 border-blue-500 shadow-lg cursor-pointer"
+                    className="w-7 h-7 rounded-md border-2 border-blue-500 cursor-pointer"
                     onClick={() => {
                       window.electron.ipcRenderer.sendMessage(
                         'open-image',

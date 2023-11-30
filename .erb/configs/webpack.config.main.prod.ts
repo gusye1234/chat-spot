@@ -17,7 +17,7 @@ deleteSourceMaps();
 
 const configuration: webpack.Configuration = {
   devtool: 'source-map',
-
+  // externals: ['electron-screenshots'],
   mode: 'production',
 
   target: 'electron-main',
