@@ -1,9 +1,12 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from './components/ui/textarea';
+import { Separator } from './components/ui/separator';
 import {
   Copy,
   CopyCheck,
@@ -15,6 +18,9 @@ import {
   Plus,
   X,
   Camera,
+  ArrowRight,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { cn, validateOpenAIKey } from './lib/utils';
 import { OpenAI } from 'openai';
@@ -43,30 +49,25 @@ window.electron.ipcRenderer.on('reset-openai-key', () => {
 });
 
 window.electron.ipcRenderer.on('reload-openai-model', () => {
-  openaiUserKey = window.electron.openai.openaiModel;
+  openaiModel = window.electron.openai.openaiModel;
   window.location.reload();
 });
 
 function Spotlight() {
   const [openAIKey, setOpenAIKey] = useState('');
   const [promptDict, setPromptDict] = useState(window.utils.getPrompts());
-  // const [openaiKeyAlready, setOpenaiKeyAlready] = useState(
-  //   validateOpenAIKey(window.electron.openai.openaiKey),
-  // );
+  const specialKey = window.utils.isDarwin ? '⌘' : 'Ctrl';
   const openaiKeyAlready = validateOpenAIKey(openaiUserKey);
   const [userInput, setUserInput] = useState('');
   const [imageInput, setImageInput] = useState('');
   const [promptOpen, setPromptOpen] = useState(false);
   const [promptSelect, setPromptSelect] = useState(0);
   const [waiting, setWaiting] = useState(false);
-  const [canvasRect, setCanvasRect] = useState({
-    width: 0,
-    height: 0,
-  });
+  const [theme, setTheme] = useState('light');
+
   const stopGenerating = useRef(false);
   const totalWindow = useRef<HTMLDivElement>(null);
-  const inputBox = useRef<HTMLInputElement>(null);
-  const outputPane = useRef<HTMLTextAreaElement>(null);
+  const inputBox = useRef<HTMLTextAreaElement>(null);
   const [copied, setCopied] = useState(false);
   const [autoCopy, setAutoCopy] = useState(true);
   const [userHistory, setUserHistory] = useState<string[]>([]);
@@ -79,15 +80,17 @@ function Spotlight() {
   });
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('open-window', () => {
-      if (inputBox.current) {
-        inputBox.current.focus();
-      }
-      return () => {
-        window.electron.ipcRenderer.removeAllListeners('open-window');
-      };
-    });
+    document.documentElement.classList.add('dark');
+    // document.documentElement.classList.remove('dark');
   }, []);
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  }, [theme]);
 
   useEffect(() => {
     const cancelListen = window.electron.ipcRenderer.on(
@@ -100,30 +103,53 @@ function Spotlight() {
     return cancelListen;
   }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSend();
-    }
-    if (e.key === 'ArrowUp') {
-      if (historyNextIndex < userHistory.length) {
-        setUserInput(userHistory[historyNextIndex]);
-        setHistoryNextIndex(historyNextIndex + 1);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (window.utils.isDarwin) {
+      if (e.metaKey && e.key === 'Enter') {
+        e.preventDefault();
+        handleSend();
       }
-    }
-    if (e.key === 'ArrowDown') {
-      if (historyNextIndex > 1) {
-        setUserInput(userHistory[historyNextIndex - 2]);
-        setHistoryNextIndex(historyNextIndex - 1);
-      } else {
-        setHistoryNextIndex(0);
-        setUserInput('');
+      if (e.metaKey && e.key === 'ArrowUp') {
+        if (historyNextIndex < userHistory.length) {
+          setUserInput(userHistory[historyNextIndex]);
+          setHistoryNextIndex(historyNextIndex + 1);
+        }
+      }
+      if (e.metaKey && e.key === 'ArrowDown') {
+        if (historyNextIndex > 1) {
+          setUserInput(userHistory[historyNextIndex - 2]);
+          setHistoryNextIndex(historyNextIndex - 1);
+        } else {
+          setHistoryNextIndex(0);
+          setUserInput('');
+        }
+      }
+    } else {
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        handleSend();
+      }
+      if (e.ctrlKey && e.key === 'ArrowUp') {
+        if (historyNextIndex < userHistory.length) {
+          setUserInput(userHistory[historyNextIndex]);
+          setHistoryNextIndex(historyNextIndex + 1);
+        }
+      }
+      if (e.ctrlKey && e.key === 'ArrowDown') {
+        if (historyNextIndex > 1) {
+          setUserInput(userHistory[historyNextIndex - 2]);
+          setHistoryNextIndex(historyNextIndex - 1);
+        } else {
+          setHistoryNextIndex(0);
+          setUserInput('');
+        }
       }
     }
   };
 
   // if (window.utils.isDebug) {
   //   window.electron.openai.deleteOpenAIKey();
+  //   window.electron.openai.deleteOpenAIModel();
   // }
   const handleSetOpenAIKey = async () => {
     if (validateOpenAIKey(openAIKey)) {
@@ -166,6 +192,7 @@ prompt: ${content}`);
     stopGenerating.current = false;
     setCopied(false);
     setWaiting(true);
+    setUserInput('');
     setAiResponse(thinkingPrompt);
     let currentResponse = '';
     try {
@@ -266,61 +293,34 @@ prompt: ${content}`);
 
   useEffect(() => {
     if (!promptOpen) {
-      if (inputBox.current) inputBox.current.focus();
+      if (inputBox && inputBox.current) inputBox.current.focus();
     }
   }, [promptOpen]);
 
   useEffect(() => {
-    if (inputBox.current) inputBox.current.focus();
+    if (inputBox && inputBox.current) inputBox.current.focus();
   }, [aiResponse]);
 
-  useLayoutEffect(() => {
-    if (totalWindow && totalWindow.current) {
-      window.electron.ipcRenderer.sendMessage('resize-window', {
-        width: totalWindow.current.clientWidth,
-        height: totalWindow.current.clientHeight,
-      });
-      setCanvasRect({
-        width: totalWindow.current.clientWidth,
-        height: totalWindow.current.clientHeight,
-      });
-    }
-    if (inputBox.current) inputBox.current.focus();
-  }, []);
-
   useEffect(() => {
-    if (totalWindow && totalWindow.current) {
-      const currentRect = {
-        width: totalWindow.current.clientWidth,
-        height: totalWindow.current.clientHeight,
-      };
-      if (
-        currentRect.width !== canvasRect.width ||
-        currentRect.height !== canvasRect.height
-      ) {
-        window.electron.ipcRenderer.sendMessage('resize-window', currentRect);
-        setCanvasRect(currentRect);
+    window.electron.ipcRenderer.on('open-window', () => {
+      if (inputBox.current) {
+        inputBox.current.focus();
       }
-    }
-    // if (inputBox.current) inputBox.current.focus();
-  }, [
-    openaiKeyAlready,
-    userInput,
-    promptOpen,
-    aiResponse,
-    canvasRect,
-    totalWindow,
-  ]);
-
+      return () => {
+        window.electron.ipcRenderer.removeAllListeners('open-window');
+      };
+    });
+  }, []);
   return (
-    <div className="p-1" ref={totalWindow}>
-      <div className="p-2 flex flex-col justify-center items-center rounded-2xl bg-background border-2">
+    <div className="" ref={totalWindow}>
+      <div className="max-h-[362px] min-h-[362px] overflow-clip flex flex-col justify-start items-center bg-background">
         {openaiKeyAlready ? (
-          <div className="relative flex flex-row justify-start items-center w-full">
-            <Input
+          <div className="relative flex flex-row justify-start items-center w-full border-b-2 py-1 dark:border-b dark:border-blue-950">
+            <Textarea
               autoFocus
               ref={inputBox}
-              placeholder="... press enter ⏎ to send, or use / to invoke prompt"
+              maxRows={4}
+              placeholder="Ask me anything ..."
               value={userInput}
               onChange={(e) => {
                 setHistoryNextIndex(0);
@@ -328,21 +328,30 @@ prompt: ${content}`);
               }}
               onKeyDown={handleKeyDown}
               disabled={waiting || promptOpen}
-              className="grow text-ellipsis overflow-clip pl-10 pr-8 h-12 text-xl placeholder:text-lg placeholder:font-light shadow-md"
+              className="grow bg-transparent rounded-none border-none text-primary text-ellipsis overflow-clip pl-11 pr-16 h-12 text-xl placeholder:font-light scrollbar-w-2 scrollbar-track-blue-lighter dark:scrollbar-track-blue-darker scrollbar-thumb-blue scrollbar-thumb-rounded overflow-y-auto resize-none"
             />
             <User ready={userInput.length > 0 && !waiting} />
             <Button
-              className="absolute right-1 text-zinc-500 px-1 rounded-md text-center flex justify-center items-center"
+              className="absolute bottom-2 right-9 text-zinc-500 px-1 rounded-md text-center flex justify-center items-center"
               variant="ghost"
               onClick={() => {
                 window.electron.ipcRenderer.sendMessage('open-screenshot');
               }}
             >
-              <Camera className="w-6 h-6" />
+              <Camera className="w-6 h-6" strokeWidth={1} />
+            </Button>
+            <Button
+              className="absolute bottom-2 right-1 text-zinc-500 px-1 rounded-md text-center flex justify-center items-center"
+              variant="ghost"
+              onClick={() => {
+                handleSend();
+              }}
+            >
+              <ArrowRight className="w-6 h-6" strokeWidth={1} />
             </Button>
           </div>
         ) : (
-          <div className="relative flex flex-row justify-start items-center w-full">
+          <div className="relative border-b-2 flex flex-row justify-start items-center w-full dark:border-b dark:border-blue-950">
             <Input
               autoFocus
               type="password"
@@ -364,242 +373,287 @@ prompt: ${content}`);
                   }
                 }
               }}
-              className="grow text-ellipsis overflow-clip pl-10 h-12 text-xl placeholder:text-lg placeholder:font-light shadow-md"
+              className="grow bg-background text-primary border-none text-ellipsis overflow-clip focus:rounded-none pl-11 h-12 text-xl placeholder:text-lg placeholder:font-light"
             />
             <User ready={validateOpenAIKey(openAIKey)} />
           </div>
         )}
-        {promptOpen && (
-          <div
-            id="promptSheet"
-            className="mt-1 p-1 max-h-[176px] w-full border-2 shadow-md rounded-md overflow-y-scroll scrollbar-w-2 scrollbar-thumb-blue scrollbar-thumb-rounded"
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setPromptSelect(promptSelect ? promptSelect - 1 : 0);
-                return;
-              }
-              if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                const promptLength = Object.keys(promptDict).length;
-                setPromptSelect(
-                  promptSelect < promptLength ? promptSelect + 1 : promptLength,
-                );
-                return;
-              }
-              if (e.key === 'Escape') {
+        <div className="relative grow overflow-auto w-full flex flex-row justify-start items-stretch py-2 pl-2 bg-background">
+          {promptOpen && (
+            <div
+              id="promptSheet"
+              className="absolute inset-x-10 top-0 z-50 bg-transparent border-t-0 dark:border-blue-950 shadow-lg backdrop-blur-md p-1 max-h-[196px] border rounded-b-md overflow-y-auto scrollbar-w-2 scrollbar-thumb-blue scrollbar-thumb-rounded"
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  setPromptSelect(promptSelect ? promptSelect - 1 : 0);
+                  return;
+                }
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  const promptLength = Object.keys(promptDict).length;
+                  setPromptSelect(
+                    promptSelect < promptLength
+                      ? promptSelect + 1
+                      : promptLength,
+                  );
+                  return;
+                }
+                if (e.key === 'Escape') {
+                  setPromptOpen(false);
+                  return;
+                }
+              }}
+              onMouseLeave={(e) => {
                 setPromptOpen(false);
-                return;
-              }
-            }}
-          >
-            <div className="w-full flex flex-col justify-start items-center gap-0.5">
-              <Button
-                id="promptSheet"
-                ref={(button) => promptSelect === 0 && button && button.focus()}
-                size="sm"
-                className="w-full text-start"
-                variant="ghost"
-                key={0}
-                onClick={() => handlePromptSheetAdd()}
-              >
-                <Plus />
-              </Button>
-              {Object.keys(promptDict).map((key, index) => {
-                const indexR = index + 1;
-                return (
-                  <div
-                    className="w-full relative flex flex-row items-center"
-                    key={key}
-                  >
-                    <Button
-                      id="promptSheet"
-                      ref={(button) =>
-                        promptSelect === indexR && button && button.focus()
-                      }
-                      className={cn(
-                        'grow flex flex-row justify-start items-center',
-                        indexR % 2 ? ' bg-muted' : '',
-                      )}
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        console.log('Clicked');
-                        handlePromptClick(key);
-                      }}
+              }}
+            >
+              <div className="w-full flex flex-col justify-start items-center">
+                <Button
+                  id="promptSheet"
+                  ref={(button) =>
+                    promptSelect === 0 && button && button.focus()
+                  }
+                  size="sm"
+                  className="w-full text-primary"
+                  variant="ghost"
+                  key={0}
+                  onClick={() => handlePromptSheetAdd()}
+                >
+                  <Plus />
+                </Button>
+                {Object.keys(promptDict).map((key, index) => {
+                  const indexR = index + 1;
+                  return (
+                    <div
+                      key={key}
+                      className="w-full flex flex-col justify-start items-center"
                     >
-                      <span className="font-semibold mr-1">{key}</span>
-                      <span className="grow overflow-x-clip text-ellipsis font-normal text-zinc-500 whitespace-nowrap text-start">
-                        {promptDict[key]}
-                      </span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute w-5 h-5 right-1 text-zinc-500"
-                      onClick={() => {
-                        setPromptOpen(false);
-                        if (indexR === promptSelect) {
-                          setPromptSelect(0);
-                        }
-                        window.utils.deletePrompt(key);
-                        delete promptDict[key];
-                        setPromptDict(promptDict);
-                      }}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                );
-              })}
+                      <Separator className="w-full mt-0.5" />
+                      <div className="group w-full relative flex flex-row items-center">
+                        <Button
+                          id="promptSheet"
+                          ref={(button) =>
+                            promptSelect === indexR && button && button.focus()
+                          }
+                          className={cn(
+                            'grow flex flex-row justify-start items-center',
+                          )}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            console.log('Clicked');
+                            handlePromptClick(key);
+                          }}
+                        >
+                          <span className="font-semibold mr-1 text-primary">
+                            {key}
+                          </span>
+                          <span className="grow overflow-x-clip text-ellipsis font-normal text-zinc-500 whitespace-nowrap text-start">
+                            {promptDict[key]}
+                          </span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute w-5 h-5 right-1 text-zinc-500 invisible group-hover:visible"
+                          onClick={() => {
+                            setPromptOpen(false);
+                            if (indexR === promptSelect) {
+                              setPromptSelect(0);
+                            }
+                            window.utils.deletePrompt(key);
+                            delete promptDict[key];
+                            setPromptDict(promptDict);
+                          }}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
-        <div className="relative w-full grow mt-1">
-          <Textarea
-            ref={outputPane}
-            maxRows={18}
-            minRows={1}
-            value={aiResponse}
-            // TODO how to focus at the end of the line when generating?
-            placeholder={openaiKeyAlready ? greetingPrompt : cantGreetingPrompt}
-            className="w-full resize-none pt-10 px-2 scrollbar-w-2 scrollbar-track-blue-lighter scrollbar-thumb-blue scrollbar-thumb-rounded font-sans font-semibold text-sm text-zinc-500 shadow-md overflow-visible"
-          />
-          <TooltipProvider>
-            <div className="absolute top-2 left-2 flex flex-row items-center justify-start gap-2">
-              <Tooltip>
-                <TooltipTrigger>
-                  <Bot waiting={waiting} />
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p className="text-xs italic text-muted">{openaiModel}</p>
-                </TooltipContent>
-              </Tooltip>
-              {window.utils.isDebug && (
+          )}
+          <div className="flex flex-col justify-start items-center gap-1">
+            <TooltipProvider>
+              <div className="flex flex-col items-center justify-start gap-1">
                 <Tooltip>
                   <TooltipTrigger>
-                    <div className="bg-secondary p-1 rounded-md">
-                      <BugPlay
-                        className="w-4 h-4 text-zinc-500"
-                        onClick={() => {
-                          window.electron.ipcRenderer.sendMessage(
-                            'open-dev-mode',
-                          );
-                        }}
-                      />
-                    </div>
+                    <Bot waiting={waiting} />
                   </TooltipTrigger>
                   <TooltipContent side="right">
-                    <p>Dev mode</p>
+                    <p className="text-xs italic text-muted">{openaiModel}</p>
                   </TooltipContent>
                 </Tooltip>
-              )}
-              {imageInput && (
-                <div className="relative group w-7 h-7">
-                  <X
-                    className="absolute -top-1 -right-1 bg-secondary rounded-full w-4 h-4 invisible group-hover:visible cursor-pointer"
-                    onClick={() => {
-                      setImageInput('');
-                    }}
-                  />
-                  <img
-                    src={imageInput}
-                    alt="screen shot"
-                    className="w-7 h-7 rounded-md border-2 border-blue-500 cursor-pointer"
-                    onClick={() => {
-                      window.electron.ipcRenderer.sendMessage(
-                        'open-image',
-                        imageInput,
-                      );
-                      handleCopy(imageInput);
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          </TooltipProvider>
-          <TooltipProvider>
-            <div className="absolute top-2 right-2 h-7 flex flex-row justify-center items-center bg-secondary rounded-md border-b-2">
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button
-                    variant={'ghost'}
-                    size={'icon'}
-                    className="w-7 h-7 text-zinc-500"
-                    onClick={() => {
-                      setAiResponse('');
-                    }}
-                    disabled={!aiResponse || waiting || !openaiKeyAlready}
-                  >
-                    <Eraser className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>empty the output</p>
-                </TooltipContent>
-              </Tooltip>
+              </div>
+            </TooltipProvider>
+            <TooltipProvider>
+              <div className="flex flex-col justify-center items-center bg-secondary rounded-md dark:bg-blue-950">
+                {window.utils.isDebug && (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="bg-secondary p-1 rounded-md dark:bg-blue-950">
+                        <BugPlay
+                          className="w-4 h-4 text-zinc-500"
+                          strokeWidth={1}
+                          onClick={() => {
+                            window.electron.ipcRenderer.sendMessage(
+                              'open-dev-mode',
+                            );
+                          }}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Dev mode</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      variant={'ghost'}
+                      size={'icon'}
+                      className="w-7 h-7 text-zinc-500"
+                      onClick={() => {
+                        setAiResponse('');
+                      }}
+                      disabled={!aiResponse || waiting || !openaiKeyAlready}
+                    >
+                      <Eraser className="w-4 h-4" strokeWidth={1} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>empty the output</p>
+                  </TooltipContent>
+                </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button
-                    variant={'ghost'}
-                    size={'icon'}
-                    className="w-7 h-7 text-zinc-500"
-                    onClick={() => (stopGenerating.current = true)}
-                    disabled={!waiting}
-                  >
-                    <Pause className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>stop generating</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button
-                    variant={'ghost'}
-                    size={'icon'}
-                    className="w-7 h-7 text-zinc-500"
-                    onClick={() => {
-                      handleCopy(aiResponse);
-                    }}
-                    disabled={!aiResponse || waiting || !openaiKeyAlready}
-                  >
-                    {copied ? (
-                      <CopyCheck className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>copy the content</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button
-                    variant={'ghost'}
-                    size={'icon'}
-                    className="w-7 h-7 text-zinc-500"
-                    onClick={() => {
-                      setAutoCopy(!autoCopy);
-                    }}
-                  >
-                    {autoCopy ? (
-                      <ClipboardCopy className="w-4 h-4" />
-                    ) : (
-                      <Clipboard className="w-4 h-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>auto-copy: {autoCopy ? 'on' : 'off'}</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      variant={'ghost'}
+                      size={'icon'}
+                      className="w-7 h-7 text-zinc-500"
+                      onClick={() => (stopGenerating.current = true)}
+                      disabled={!waiting}
+                    >
+                      <Pause className="w-4 h-4" strokeWidth={1} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>stop generating</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      variant={'ghost'}
+                      size={'icon'}
+                      className="w-7 h-7 text-zinc-500"
+                      onClick={() => {
+                        handleCopy(aiResponse);
+                      }}
+                      disabled={!aiResponse || waiting || !openaiKeyAlready}
+                    >
+                      {copied ? (
+                        <CopyCheck className="w-4 h-4" strokeWidth={1} />
+                      ) : (
+                        <Copy className="w-4 h-4" strokeWidth={1} />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>copy the content</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      variant={'ghost'}
+                      size={'icon'}
+                      className="w-7 h-7 text-zinc-500"
+                      onClick={() => {
+                        setAutoCopy(!autoCopy);
+                      }}
+                    >
+                      {autoCopy ? (
+                        <ClipboardCopy className="w-4 h-4" strokeWidth={1} />
+                      ) : (
+                        <Clipboard className="w-4 h-4" strokeWidth={1} />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>auto-copy: {autoCopy ? 'on' : 'off'}</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      variant={'ghost'}
+                      size={'icon'}
+                      className="w-7 h-7 text-zinc-500"
+                      onClick={() => {
+                        setTheme(theme === 'light' ? 'dark' : 'light');
+                      }}
+                    >
+                      {theme === 'light' ? (
+                        <Sun className="w-4 h-4" strokeWidth={1} />
+                      ) : (
+                        <Moon className="w-4 h-4" strokeWidth={1} />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">
+                    <p>theme: {theme}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
+            {imageInput && (
+              <div className="relative group w-7 h-7">
+                <X
+                  className="absolute -top-1 -right-1 bg-secondary rounded-full w-4 h-4 invisible group-hover:visible cursor-pointer"
+                  onClick={() => {
+                    setImageInput('');
+                  }}
+                />
+                <img
+                  src={imageInput}
+                  alt="screen shot"
+                  className="w-7 h-7 rounded-md border-2 border-blue-500 cursor-pointer"
+                  onClick={() => {
+                    window.electron.ipcRenderer.sendMessage(
+                      'open-image',
+                      imageInput,
+                    );
+                    handleCopy(imageInput);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          <Markdown
+            remarkPlugins={[remarkGfm]}
+            className="w-full text-sm py-1 px-2 font-sans rounded-md text-zinc-500 dark:text-zinc-300 font-semibold overflow-auto scrollbar-w-2 scrollbar-track-blue-lighter dark:scrollbar-track-blue-darker scrollbar-thumb-blue scrollbar-thumb-rounded"
+          >
+            {aiResponse
+              ? aiResponse
+              : openaiKeyAlready
+                ? greetingPrompt
+                : cantGreetingPrompt}
+          </Markdown>
+        </div>
+        <div className="w-full border-t bg-secondary font-mono py-1 px-4 text-xs font-medium dark:bg-background dark:text-zinc-600 dark:hover:text-zinc-300 hover:text-zinc-500 dark:border-blue-950 flex flex-row justify-center items-center gap-4">
+          <span>{`⏎ New line`}</span>
+          <Separator className="h-4" orientation="vertical" />
+          <span>{`${specialKey} + ⏎ Send`}</span>
+          <Separator className="h-4" orientation="vertical" />
+          <span>{`/ Prompt`}</span>
+          <Separator className="h-4" orientation="vertical" />
+          <span>{`${specialKey} + ↑↓ Browser history`}</span>
         </div>
       </div>
     </div>

@@ -140,7 +140,7 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: 724,
-    height: 100,
+    height: 362,
     // resizable: false,
     focusable: true,
     frame: false,
@@ -192,10 +192,15 @@ const createWindow = async () => {
   // menuBuilder.buildMenu();
 
   // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
-    return { action: 'deny' };
-  });
+  var handleRedirect = (e: any, url: any) => {
+    if (mainWindow && url != mainWindow.webContents.getURL()) {
+      e.preventDefault();
+      shell.openExternal(url);
+    }
+  };
+
+  mainWindow.webContents.on('will-navigate', handleRedirect);
+  // mainWindow.webContents.on('new-window', handleRedirect)
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

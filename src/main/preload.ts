@@ -39,12 +39,15 @@ const electronHandler = {
   },
   openai: {
     openaiKey: (store.get('OpenAIKey') as string) ?? '',
-    openaiModel: (store.get('OpenAIModel') as string) ?? 'gpt-3.5-turbo-1106',
+    openaiModel: (store.get('OpenAIModel') as string) ?? 'gpt-3.5-turbo',
     saveOpenAIKey(key: string) {
       store.set('OpenAIKey', key);
     },
     deleteOpenAIKey() {
       store.delete('OpenAIKey');
+    },
+    deleteOpenAIModel() {
+      store.delete('OpenAIModel');
     },
   },
 };
@@ -72,6 +75,7 @@ const utilsHandler = {
   },
   isDebug:
     process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true',
+  isDarwin: process.platform === 'darwin',
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
