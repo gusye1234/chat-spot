@@ -14,21 +14,18 @@ ChatSpot app is developed by \`gusye1234\`, and this app is open sourced in Gith
 
 export const thinkingPrompt = 'thinking...';
 
-export const greetingPrompt = `How can I help you today? You can ask something like:
+export const greetingPrompt = `## How can I help you today? 
+You can ask something like:
 * How to use ChatSpot?
-* Help me wite this \`code\`...
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?
-* Can you write me a story?`;
+* Help me wite this \`code\`
+* Help me understand this table: 
+
+| Name      | Age | Gender |
+|-----------|-----|--------|
+| John Doe  | 25  | Male   |
+| Jane Smith| 30  | Female |
+| Alex Lee  | 22  | Male   |
+`;
 
 export const cantGreetingPrompt =
   "I can't work without an OpenAI key😩, please enter one **above**";

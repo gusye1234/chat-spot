@@ -140,7 +140,7 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: 724,
-    height: 362,
+    height: 512,
     // resizable: false,
     focusable: true,
     frame: false,
@@ -321,7 +321,7 @@ app
             type: 'radio',
             click: () => {
               if (mainWindow) {
-                store.set('OpenAIModel', 'gpt-3.5-turbo-1106');
+                store.set('OpenAIModel', 'gpt-3.5-turbo');
                 mainWindow.webContents.send('reload-openai-model');
               }
             },
@@ -332,7 +332,7 @@ app
             type: 'radio',
             click: () => {
               if (mainWindow) {
-                store.set('OpenAIModel', 'gpt-4-1106-preview');
+                store.set('OpenAIModel', 'gpt-4-turbo');
                 mainWindow.webContents.send('reload-openai-model');
               }
             },

@@ -43,6 +43,8 @@ import {
 
 let openaiUserKey = window.electron.openai.openaiKey;
 let openaiModel = window.electron.openai.openaiModel;
+let localTheme = window.utils.getTheme();
+
 window.electron.ipcRenderer.on('reset-openai-key', () => {
   openaiUserKey = '';
   window.location.reload();
@@ -63,13 +65,13 @@ function Spotlight() {
   const [promptOpen, setPromptOpen] = useState(false);
   const [promptSelect, setPromptSelect] = useState(0);
   const [waiting, setWaiting] = useState(false);
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(localTheme);
 
   const stopGenerating = useRef(false);
   const totalWindow = useRef<HTMLDivElement>(null);
   const inputBox = useRef<HTMLTextAreaElement>(null);
   const [copied, setCopied] = useState(false);
-  const [autoCopy, setAutoCopy] = useState(true);
+  const [autoCopy, setAutoCopy] = useState(false);
   const [userHistory, setUserHistory] = useState<string[]>([]);
   const [historyNextIndex, setHistoryNextIndex] = useState(0);
   const [aiResponse, setAiResponse] = useState('');
@@ -87,8 +89,10 @@ function Spotlight() {
   useEffect(() => {
     if (theme === 'light') {
       document.documentElement.classList.remove('dark');
+      window.utils.setTheme('light');
     } else {
       document.documentElement.classList.add('dark');
+      window.utils.setTheme('dark');
     }
   }, [theme]);
 
@@ -313,7 +317,7 @@ prompt: ${content}`);
   }, []);
   return (
     <div className="" ref={totalWindow}>
-      <div className="max-h-[362px] min-h-[362px] overflow-clip flex flex-col justify-start items-center bg-background">
+      <div className="max-h-[512px] min-h-[512px] overflow-clip flex flex-col justify-start items-center bg-background">
         {openaiKeyAlready ? (
           <div className="relative flex flex-row justify-start items-center w-full border-b-2 py-1 dark:border-b dark:border-blue-950">
             <Textarea
@@ -646,7 +650,9 @@ prompt: ${content}`);
                 : cantGreetingPrompt}
           </Markdown>
         </div>
-        <div className="w-full border-t bg-secondary font-mono py-1 px-4 text-xs font-medium dark:bg-background dark:text-zinc-600 dark:hover:text-zinc-300 hover:text-zinc-500 dark:border-blue-950 flex flex-row justify-center items-center gap-4">
+        <div className="w-full border-t bg-secondary font-mono text-zinc-400 py-1 px-4 text-xs font-medium dark:bg-background dark:text-zinc-600 dark:hover:text-zinc-300 hover:text-zinc-500 dark:border-blue-950 flex flex-row justify-center items-center gap-4">
+          <span>{`${specialKey} + Alt + K Toggle`}</span>
+          <Separator className="h-4" orientation="vertical" />
           <span>{`⏎ New line`}</span>
           <Separator className="h-4" orientation="vertical" />
           <span>{`${specialKey} + ⏎ Send`}</span>

@@ -4,12 +4,18 @@
 
 @layer base {
   h1 {
-    @apply text-xl font-semibold;
+    @apply text-xl font-semibold my-1;
   }
   h2 {
-    @apply text-lg font-semibold;
+    @apply text-lg font-semibold my-1;
   }
   h3 {
+    @apply text-sm font-semibold my-1;
+  }
+  h4 {
+    @apply text-sm font-semibold;
+  }
+  h5 {
     @apply text-sm font-semibold;
   }
   a {
@@ -25,16 +31,43 @@
     @apply bg-secondary rounded-md px-1 text-sm font-medium font-mono;
   }
   pre {
-    @apply w-fit bg-secondary rounded-md p-1 text-sm font-medium font-mono;
+    @apply m-1 w-fit bg-secondary rounded-md p-1 text-sm font-medium font-mono;
   }
   table {
-    @apply table-auto border-2 my-1 text-center;
+    @apply m-1 border-separate border-spacing-0 table-auto text-center;
   }
-  thead {
-    @apply border-b text-foreground font-medium bg-secondary px-4;
+  table tr th,
+  table tr td {
+    @apply px-2 border-b border-r;
   }
-  tr {
-    @apply border-b divide-x-2;
+  table tr th:first-child,
+  table tr td:first-child {
+    @apply border-l;
+  }
+  table tr th {
+    @apply bg-secondary border-t;
+  }
+  table tr td {
+    @apply bg-background;
+  }
+  /* top-left border-radius */
+  table tr:first-child th:first-child {
+    @apply rounded-tl-md;
+  }
+
+  /* top-right border-radius */
+  table tr:first-child th:last-child {
+    @apply rounded-tr-md;
+  }
+
+  /* bottom-left border-radius */
+  table tr:last-child td:first-child {
+    @apply rounded-bl-md;
+  }
+
+  /* bottom-right border-radius */
+  table tr:last-child td:last-child {
+    @apply rounded-br-md;
   }
   :root {
     --background: 0 0% 100%;

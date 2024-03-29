@@ -69,9 +69,11 @@ const utilsHandler = {
   clipboardWrite(content: string) {
     electron.clipboard.writeText(content);
   },
-  openUrl(url: string) {
-    console.log('Opening', url.slice(0, 50));
-    shell.openExternal('https://github.com', { activate: true });
+  getTheme() {
+    return (store.get('theme') as string) ?? 'light';
+  },
+  setTheme(theme: string) {
+    store.set('theme', theme);
   },
   isDebug:
     process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true',
