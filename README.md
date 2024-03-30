@@ -21,41 +21,35 @@
 </div>
 
 
+🥸 ChatSpot is an AI-powered, Spotlight assistant designed to help users complete tasks quickly and efficiently. Anytime or anywhere, press `command/ctrl + alt + k` and ChatSpot is always ready to assist. 
 
 
+Light             | Dark 
+:-------------------------:|:-------------------------:
+![](./imgs/cover.png)  |  ![](./imgs/cover_dark.png)
 
+🔥 It supports multi-lines input, and support as many MarkDown types as possible:
+Multi-line Input             | Markdown Output 
+:-------------------------:|:-------------------------:
+![](./imgs/multi-line.png)  |  ![](./imgs/markdown.png)
 
-<p align="center">
-  <img src="https://github.com/gusye1234/chat-spot/releases/download/v0.0.3/show.gif" alt="show" style="border-radius:20px;">
-</p>
+📒 It supports custom prompt saving, all you need to type '/' and your own prompt sheet will show up:
 
+<img src="./imgs/prompt.png" alt="prompt" style="zoom:40%;" />
 
-
-
-
-
-ChatSpot🥸 is an AI-powered, Spotlight assistant designed to help users complete tasks quickly and efficiently. Anytime or anywhere, press `command/ctrl + alt + k` and ChatSpot is always ready to assist. 
-
-By default, anything said by ChatSpot will be automatically copied. So all you need is:
+Anything said by ChatSpot can be automatically copied (turn autocopy on). So all you need is:
 
 1. Toggle ChatSpot with gobal shortcut  `command/ctrl + alt + k`
 2. Ask question and wait the streaming output finished
 3. Untoggle ChatSpot with gobal shortcut  `command/ctrl + alt + k`, and the focus will be back to your previsous working place, where you can paste the response from ChatGPT
 
-ChatSpot supports the latest GPT-4 vision, you can snip anywhere of your screen and ask about it🤯:
+
+
+Also, ChatSpot supports the latest GPT-4 vision, you can snip anywhere of your screen and ask about it🤯:
 
 <p align="center">
   <img src="https://github.com/gusye1234/chat-spot/releases/download/v0.0.3/vision.gif" alt="show" style="border-radius:20px;">
 </p>
-
-ChatSpot also supports custom prompts📒. You can use "/" to invoke a window customized with your prompt:
-
-<p align="center">
-  <img src="https://github.com/gusye1234/chat-spot/releases/download/v0.0.3/prompt.gif" alt="prompt" style="border-radius:20px;">
-</p>
-
-
-
 
 ## Get Started
 
@@ -65,9 +59,9 @@ Download the app
 
 | Platform | Tested Supports | Download                                                     |
 | -------- | --------------- | ------------------------------------------------------------ |
-| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.3) |
-| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.3/ChatSpot-Setup-0.0.3.exe) |
-| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.3/ChatSpot-0.0.3.AppImage) |
+| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.4) |
+| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.3/ChatSpot-Setup-0.0.4.exe) |
+| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.3/ChatSpot-0.0.4.AppImage) |
 
 
 
@@ -76,14 +70,14 @@ Download the app
 Clone this repo and run the following commands:
 
 ```shell
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 To package the App in your platform (MacOS, Windows, Linux...), run:
 
 ```shell
-pnpm package
+npm run package
 ```
 
 

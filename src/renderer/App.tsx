@@ -199,6 +199,7 @@ prompt: ${content}`);
     setUserInput('');
     setAiResponse(thinkingPrompt);
     let currentResponse = '';
+    console.log('Using', openaiModel);
     try {
       let stream;
       if (!imageInput) {

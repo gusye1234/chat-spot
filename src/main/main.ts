@@ -332,7 +332,7 @@ app
             type: 'radio',
             click: () => {
               if (mainWindow) {
-                store.set('OpenAIModel', 'gpt-4-turbo');
+                store.set('OpenAIModel', 'gpt-4-turbo-preview');
                 mainWindow.webContents.send('reload-openai-model');
               }
             },
