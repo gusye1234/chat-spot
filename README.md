@@ -3,22 +3,23 @@
   <p><strong>Spotlight app for ChatGPT</strong></p>
     <p>
     <a href="https://github.com/gusye1234/chat-spot/releases/tag/v0.0.2">
-      <img src="https://img.shields.io/badge/version-v0.0.3 beta-blue">
+      <img src="https://img.shields.io/badge/version-v0.0.4-blue">
     </a>
           <a href="https://github.com/gusye1234/chat-spot/actions?query=workflow%3APublish">
       <img src="https://github.com/gusye1234/chat-spot/actions/workflows/build.yml/badge.svg">
     </a>
-    <a href="https://github.com/gusye1234/chat-spot">
+    <a href="https://github.com/gusye1234/chat-spot?tab=readme-ov-file#get-started">
       <img src="https://img.shields.io/badge/platform-macOS-green">
     </a>
-    <a href="https://github.com/gusye1234/chat-spot">
+    <a href="https://github.com/gusye1234/chat-spot?tab=readme-ov-file#get-started">
       <img src="https://img.shields.io/badge/platform-windows-green">
     </a>
-    <a href="https://github.com/gusye1234/chat-spot">
+    <a href="https://github.com/gusye1234/chat-spot?tab=readme-ov-file#get-started">
       <img src="https://img.shields.io/badge/platform-linux-green">
     </a>
   </p>
 </div>
+
 
 
 🥸 ChatSpot is an AI-powered, Spotlight assistant designed to help users complete tasks quickly and efficiently. Anytime or anywhere, press `command/ctrl + alt + k` and ChatSpot is always ready to assist. 
@@ -59,9 +60,9 @@ Download the app
 
 | Platform | Tested Supports | Download                                                     |
 | -------- | --------------- | ------------------------------------------------------------ |
-| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.4) |
-| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.3/ChatSpot-Setup-0.0.4.exe) |
-| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/tag/v0.0.3/ChatSpot-0.0.4.AppImage) |
+| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-0.0.4.dmg) |
+| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-Setup-0.0.4.exe) |
+| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-0.0.4.AppImage) |
 
 
 
