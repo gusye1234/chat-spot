@@ -317,7 +317,9 @@ app
         submenu: [
           {
             label: 'GPT-3.5',
-            checked: true,
+            checked: store.get('OpenAIModel')
+              ? store.get('OpenAIModel') === 'gpt-3.5-turbo'
+              : true,
             type: 'radio',
             click: () => {
               if (mainWindow) {
@@ -327,12 +329,14 @@ app
             },
           },
           {
-            label: 'GPT-4',
-            checked: false,
+            label: 'GPT-4o',
+            checked: store.get('OpenAIModel')
+              ? store.get('OpenAIModel') === 'gpt-4o'
+              : false,
             type: 'radio',
             click: () => {
               if (mainWindow) {
-                store.set('OpenAIModel', 'gpt-4-turbo-preview');
+                store.set('OpenAIModel', 'gpt-4o');
                 mainWindow.webContents.send('reload-openai-model');
               }
             },

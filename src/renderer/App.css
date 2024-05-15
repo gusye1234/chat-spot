@@ -4,13 +4,13 @@
 
 @layer base {
   h1 {
-    @apply text-xl font-semibold my-1;
+    @apply text-xl font-semibold mb-1;
   }
   h2 {
-    @apply text-lg font-semibold my-1;
+    @apply text-lg font-semibold mb-1;
   }
   h3 {
-    @apply text-sm font-semibold my-1;
+    @apply text-sm font-semibold mb-1;
   }
   h4 {
     @apply text-sm font-semibold;
@@ -22,10 +22,10 @@
     @apply text-blue-600 underline;
   }
   ul {
-    @apply list-disc list-inside;
+    @apply list-disc list-inside ml-1;
   }
   ol {
-    @apply list-decimal list-inside;
+    @apply list-decimal list-inside ml-1;
   }
   code {
     @apply bg-secondary rounded-md px-1 text-sm font-medium font-mono;
