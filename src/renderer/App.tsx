@@ -71,7 +71,7 @@ function Spotlight() {
   const totalWindow = useRef<HTMLDivElement>(null);
   const inputBox = useRef<HTMLTextAreaElement>(null);
   const [copied, setCopied] = useState(false);
-  const [autoCopy, setAutoCopy] = useState(false);
+  const [autoCopy, setAutoCopy] = useState(true);
   const [userHistory, setUserHistory] = useState<string[]>([]);
   const [historyNextIndex, setHistoryNextIndex] = useState(0);
   const [aiResponse, setAiResponse] = useState('');

@@ -22,7 +22,7 @@
 
 
 
-🥸 ChatSpot is an AI-powered, Spotlight assistant designed to help users complete tasks quickly and efficiently. Anytime or anywhere, press `command/ctrl + alt + k` and ChatSpot is always ready to assist. 
+🥸 ChatSpot is an AI-powered, Spotlight assistant designed to help users complete tasks quickly and efficiently. Anytime or anywhere, press `command/ctrl + alt + k` and ChatSpot is always ready to assist. (Support OpenAI latest model `gpt-4o`!)
 
 
 Light             | Dark 
@@ -46,7 +46,7 @@ Anything said by ChatSpot can be automatically copied (turn autocopy on). So all
 
 
 
-Also, ChatSpot supports the latest GPT-4 vision, you can snip anywhere of your screen and ask about it🤯:
+Also, ChatSpot supports the latest GPT-4 vision, you can snip anywhere from your screen and ask about it🤯:
 
 <p align="center">
   <img src="https://github.com/gusye1234/chat-spot/releases/download/v0.0.3/vision.gif" alt="show" style="border-radius:20px;">
@@ -60,9 +60,9 @@ Download the app
 
 | Platform | Tested Supports | Download                                                     |
 | -------- | --------------- | ------------------------------------------------------------ |
-| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-0.0.4.dmg) |
-| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-Setup-0.0.4.exe) |
-| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-0.0.4.AppImage) |
+| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-0.0.5.dmg) |
+| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-Setup-0.0.5.exe) |
+| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.4/ChatSpot-0.0.5.AppImage) |
 
 
 
