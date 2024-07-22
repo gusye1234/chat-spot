@@ -316,14 +316,14 @@ app
         label: 'Change AI',
         submenu: [
           {
-            label: 'GPT-3.5',
+            label: 'GPT-4o-mini',
             checked: store.get('OpenAIModel')
-              ? store.get('OpenAIModel') === 'gpt-3.5-turbo'
+              ? store.get('OpenAIModel') === 'gpt-4o-mini'
               : true,
             type: 'radio',
             click: () => {
               if (mainWindow) {
-                store.set('OpenAIModel', 'gpt-3.5-turbo');
+                store.set('OpenAIModel', 'gpt-4o-mini');
                 mainWindow.webContents.send('reload-openai-model');
               }
             },

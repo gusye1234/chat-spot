@@ -39,7 +39,7 @@ const electronHandler = {
   },
   openai: {
     openaiKey: (store.get('OpenAIKey') as string) ?? '',
-    openaiModel: (store.get('OpenAIModel') as string) ?? 'gpt-3.5-turbo',
+    openaiModel: (store.get('OpenAIModel') as string) ?? 'gpt-4o-mini',
     saveOpenAIKey(key: string) {
       store.set('OpenAIKey', key);
     },

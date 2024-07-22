@@ -2,8 +2,8 @@
   <h1>ChatSpot🥸</h1>
   <p><strong>Spotlight app for ChatGPT</strong></p>
     <p>
-    <a href="https://github.com/gusye1234/chat-spot/releases/tag/v0.0.5">
-      <img src="https://img.shields.io/badge/version-v0.0.5-blue">
+    <a href="https://github.com/gusye1234/chat-spot/releases/tag/v0.0.6">
+      <img src="https://img.shields.io/badge/version-v0.0.6-blue">
     </a>
           <a href="https://github.com/gusye1234/chat-spot/actions?query=workflow%3APublish">
       <img src="https://github.com/gusye1234/chat-spot/actions/workflows/build.yml/badge.svg">
@@ -61,9 +61,9 @@ Download the app
 
 | Platform | Tested Supports | Download                                                     |
 | -------- | --------------- | ------------------------------------------------------------ |
-| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.5/ChatSpot-0.0.5.dmg) |
-| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.5/ChatSpot-Setup-0.0.5.exe) |
-| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.5/ChatSpot-0.0.5.AppImage) |
+| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.6/ChatSpot-0.0.6.dmg) |
+| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.6/ChatSpot-Setup-0.0.6.exe) |
+| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.6/ChatSpot-0.0.6.AppImage) |
 
 
 
