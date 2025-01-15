@@ -61,9 +61,9 @@ Download the app
 
 | Platform | Tested Supports | Download                                                     |
 | -------- | --------------- | ------------------------------------------------------------ |
-| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.6/ChatSpot-0.0.6.dmg) |
-| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.6/ChatSpot-Setup-0.0.6.exe) |
-| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases/download/v0.0.6/ChatSpot-0.0.6.AppImage) |
+| MacOS    | 13.5.2+         | [Release](https://github.com/gusye1234/chat-spot/releases) (`.dmg`) |
+| Windows  | Windows 10      | [Release](https://github.com/gusye1234/chat-spot/releases)(`.exe`) |
+| Linux    | Ubuntu 22.04    | [Release](https://github.com/gusye1234/chat-spot/releases)(`.AppImage`) |
 
 
 
