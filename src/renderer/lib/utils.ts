@@ -6,6 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function validateOpenAIKey(key: string) {
+  if (key.length === 0) {
+    return false;
+  }
   // if (!key.startsWith('sk-')) {
   //   return false;
   // }
